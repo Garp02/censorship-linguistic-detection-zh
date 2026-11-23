@@ -9,6 +9,7 @@ Une los 16 CSV de Ng et al. (2018) en un solo corpus depurado.
 - Conserva una sola copia de cada texto duplicado.
 - Agrega la representación en pinyin (tono numérico) de cada texto.
 """
+# %% Bibliotecas y datos
 import numpy as np
 import pandas as pd
 
@@ -31,6 +32,7 @@ categoria = {
     'smog': 'contaminación e inocuidad alimentaria',
     'kindergarten': 'abuso en guarderías'}
 
+# %% Funciones
 def cargar(path: Path) -> pd.DataFrame:
     """Lee un CSV de Ng et al. y devuelve texto, tema, etiqueta y archivo."""
     df = pd.read_csv(path, header = None, names = ['texto'], dtype = str,  keep_default_na = False)
@@ -47,6 +49,7 @@ def a_pinyin(texto: str) -> str:
     silabas = pinyin(texto, style = Style.TONE3, heteronym = True, errors = 'default')
     return ' '.join(s[0] for s in silabas)
 
+# %% Main
 if __name__ == '__main__':
 
     archivos = sorted(data.glob('*.csv'))
