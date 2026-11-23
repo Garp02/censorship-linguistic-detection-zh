@@ -20,7 +20,7 @@ salida = Path('corpus_zh.csv')
 ZW = '\u200b'
 
 # Categoría que Ng et al. (2018) asignan a cada tema.
-# melamine y poisonous-milk-powder forman el tema "milk scandal" del artículo.
+# melamine y poisonous-milk-powder forman el tema 'milk scandal' del artículo.
 categoria = {
     'boxilai': 'Bo Xilai',
     'fifty-cent': 'censura y propaganda en internet',
@@ -43,8 +43,8 @@ def cargar(path: Path) -> pd.DataFrame:
     return df.assign(tema = tema, etiqueta = etiqueta, archivo = path.name)
 
 def a_pinyin(texto: str) -> str:
-    """Convierte cada carácter chino en su sílaba con tono (ma2); lo demás pasa tal cual."""
-    silabas = pinyin(texto, style = Style.TONE3, heteronym = False, errors = 'default')
+    """Convierte cada carácter chino en su sílaba con tono."""
+    silabas = pinyin(texto, style = Style.TONE3, heteronym = True, errors = 'default')
     return ' '.join(s[0] for s in silabas)
 
 if __name__ == '__main__':
@@ -57,12 +57,12 @@ if __name__ == '__main__':
 
     print(f'Archivos encontrados: {len(archivos)}')
 
-    df = pd.concat([cargar(f) for f in archivos], ignore_index=True)
+    df = pd.concat([cargar(f) for f in archivos], ignore_index = True)
     print('Filas cargadas:', len(df))
 
-    # Limpieza (notebook, sección 1)
-    df['tiene_zw'] = df['texto'].str.contains(ZW, regex=False)
-    df['texto_zh'] = df['texto'].str.replace(ZW, '', regex=False).str.strip()
+    # Limpieza
+    df['tiene_zw'] = df['texto'].str.contains(ZW, regex = False)
+    df['texto_zh'] = df['texto'].str.replace(ZW, '', regex = False).str.strip()
 
     # Textos vacíos
     df = df[df['texto_zh'].str.len() > 0].copy()
@@ -72,34 +72,29 @@ if __name__ == '__main__':
     contradictorios = set(n_lab[n_lab > 1].index)
     df = df[~df['texto_zh'].isin(contradictorios)]
 
-    # Duplicados: se conserva la primera copia
-    df = df.drop_duplicates('texto_zh').reset_index(drop=True)
+    # Duplicados
+    df = df.drop_duplicates('texto_zh').reset_index(drop = True)
 
     # Columnas finales
-    df['label'] = (df['etiqueta'] == 'censored').astype(int) # 1 = censurado, 0 = no censurado
+    df['censured'] = (df['etiqueta'] == 'censored').astype(int) # 1 = censurado
     df['categoria'] = df['tema'].map(categoria)
     df['longitud'] = df['texto_zh'].str.len()
 
-    # Pinyin con tono numérico (se calcula sobre texto_zh, ya sin \u200b)
+    # Pinyin con tono numérico
     df['pinyin'] = df['texto_zh'].apply(a_pinyin)
-    df['n_silabas'] = df['pinyin'].str.split().str.len()
 
     corpus = df[[
-        'texto', # original, tal como viene en el CSV
-        'texto_zh', # limpio: sin \u200b ni espacios extremos
-        'pinyin', # sílabas con tono numérico (ma2 ni3 hao3)
-        'n_silabas', # número de sílabas en pinyin
-        'label', # 1 = censored, 0 = uncensored
-        'etiqueta', # censored / uncensored
-        'tema', # p. ej. smog, boxilai
+        'texto',
+        'texto_zh', # limpio: sin \u200b
+        'pinyin', # sílabas con tono
+        'censured',
+        'tema', # ej. smog, boxilai
         'categoria', # categoría de Ng et al.
-        'archivo', # CSV de origen
-        'tiene_zw', # True si traía \u200b
         'longitud' # caracteres de texto_zh
     ]].rename(columns = {'texto': 'texto_original'})
 
     corpus.to_csv(salida, index = False, encoding = 'utf-8')
 
-    print(f'Contradictorios eliminados (textos): {len(contradictorios)}')
+    print(f'Textos contradictorios eliminados: {len(contradictorios)}')
     print(f'Corpus final: {len(corpus)} publicaciones')
-    print(corpus.groupby(['tema', 'etiqueta']).size().unstack(fill_value = 0))
+    print(corpus.groupby(['tema', 'categoria']).size().unstack(fill_value = 0))
