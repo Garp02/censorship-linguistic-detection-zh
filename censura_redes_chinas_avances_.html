@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Censura en redes sociales chinas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --azul: #312783;
+      --naranja: #E94E1B;
+      --morado: #5A2673;
+      --fondo: #f7f6fc;
+      --texto: #1d1a33;
+      --gris: #6b6880;
+      --linea: #e2e0ee
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      font-family: 'Montserrat', system-ui, sans-serif;
+      color: var(--texto);
+      background: var(--fondo);
+      overflow: hidden
+    }
+
+    #barra {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 5px;
+      background: var(--linea);
+      z-index: 10
+    }
+
+    #progreso {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--azul), var(--morado), var(--naranja));
+      transition: width .3s
+    }
+
+    .slide {
+      display: none;
+      position: absolute;
+      top: 5px;
+      bottom: 60px;
+      left: 0;
+      right: 0;
+      padding: 44px 72px 24px;
+      overflow: auto;
+      flex-direction: column;
+      background: #fff
+    }
+
+    .slide.activa {
+      display: flex
+    }
+
+    .kicker {
+      font-size: 12px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--naranja);
+      font-weight: 700;
+      margin: 0 0 6px
+    }
+
+    h1 {
+      font-size: 46px;
+      color: var(--azul);
+      margin: 0 0 10px;
+      line-height: 1.15
+    }
+
+    h2 {
+      font-size: 30px;
+      color: var(--azul);
+      margin: 0 0 14px
+    }
+
+    h3 {
+      font-size: 17px;
+      color: var(--morado);
+      margin: 16px 0 8px
+    }
+
+    p,
+    li {
+      font-size: 16px;
+      line-height: 1.55
+    }
+
+    .sub {
+      font-size: 20px;
+      color: var(--morado);
+      font-weight: 600;
+      margin: 0 0 26px
+    }
+
+    .nota {
+      font-size: 13px;
+      color: var(--gris);
+      margin-top: 10px
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr))
+    }
+
+    .tarjeta {
+      border: 1px solid var(--linea);
+      border-radius: 12px;
+      padding: 16px 18px;
+      border-top: 5px solid var(--azul);
+      background: #fff
+    }
+
+    .tarjeta.n {
+      border-top-color: var(--naranja)
+    }
+
+    .tarjeta.m {
+      border-top-color: var(--morado)
+    }
+
+    .tarjeta h3 {
+      margin-top: 0
+    }
+
+    .cifra {
+      font-size: 38px;
+      font-weight: 800;
+      color: var(--azul);
+      margin: 4px 0
+    }
+
+    .cifra.n {
+      color: var(--naranja)
+    }
+
+    .cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+      align-items: start
+    }
+
+    .caja {
+      height: 340px;
+      position: relative
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin: 8px 0 14px
+    }
+
+    .chip {
+      border: 1px solid var(--azul);
+      background: #fff;
+      color: var(--azul);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font: inherit;
+      font-size: 13px;
+      cursor: pointer
+    }
+
+    .chip.on {
+      background: var(--azul);
+      color: #fff
+    }
+
+    .chip.n.on {
+      background: var(--naranja);
+      border-color: var(--naranja)
+    }
+
+    .chip.m.on {
+      background: var(--morado);
+      border-color: var(--morado)
+    }
+
+    ol.indice {
+      list-style: none;
+      padding: 0;
+      counter-reset: c;
+      max-width: 620px
+    }
+
+    ol.indice li {
+      counter-increment: c;
+      margin: 0
+    }
+
+    ol.indice button {
+      all: unset;
+      cursor: pointer;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 18px;
+      color: var(--texto);
+      border: 1px solid var(--linea);
+      margin-bottom: 10px
+    }
+
+    ol.indice button:hover {
+      border-color: var(--naranja);
+      background: #fff8f5
+    }
+
+    ol.indice button::before {
+      content: counter(c);
+      background: var(--azul);
+      color: #fff;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0
+    }
+
+    .flujo {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      margin: 10px 0 6px
+    }
+
+    .nodo {
+      background: #fff;
+      border: 2px solid var(--azul);
+      border-radius: 12px;
+      padding: 10px 12px;
+      width: 172px;
+      cursor: pointer;
+      text-align: left;
+      font: inherit;
+      color: var(--texto);
+      transition: transform .15s, box-shadow .15s
+    }
+
+    .nodo:hover {
+      transform: translateY(-2px)
+    }
+
+    .nodo.pre {
+      border-color: var(--morado)
+    }
+
+    .nodo.sel {
+      box-shadow: 0 0 0 4px rgba(233, 78, 27, .3);
+      border-color: var(--naranja)
+    }
+
+    .nodo .num {
+      font-size: 11px;
+      color: var(--gris);
+      font-weight: 700
+    }
+
+    .nodo strong {
+      display: block;
+      font-size: 14px;
+      margin: 2px 0 6px
+    }
+
+    .etq {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 9px;
+      border-radius: 999px;
+      color: #fff;
+      display: inline-block
+    }
+
+    .hecho {
+      background: var(--morado)
+    }
+
+    .pend {
+      background: #9b98ad
+    }
+
+    .flecha {
+      color: var(--naranja);
+      font-size: 22px;
+      font-weight: 700
+    }
+
+    .leyenda {
+      font-size: 12px;
+      color: var(--gris);
+      margin: 4px 0
+    }
+
+    .leyenda b {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      vertical-align: middle;
+      margin-right: 4px
+    }
+
+    .detalle {
+      border-left: 6px solid var(--naranja);
+      background: #fff8f5;
+      padding: 14px 18px;
+      border-radius: 8px;
+      min-height: 96px;
+      margin-top: 10px;
+      font-size: 15px;
+      line-height: 1.55
+    }
+
+    .detalle strong {
+      color: var(--azul)
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      font-size: 14px
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid var(--linea);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: top
+    }
+
+    th {
+      color: var(--azul);
+      font-size: 13px
+    }
+
+    td button {
+      font: inherit;
+      font-size: 13px;
+      border: 1px solid var(--azul);
+      background: #fff;
+      color: var(--azul);
+      border-radius: 8px;
+      padding: 6px 8px;
+      cursor: pointer;
+      width: 100%;
+      text-align: left
+    }
+
+    td button.on {
+      background: var(--azul);
+      color: #fff
+    }
+
+    td button.na {
+      border-style: dashed;
+      border-color: #b7b4c9;
+      color: #9b98ad;
+      cursor: default
+    }
+
+    .pendiente {
+      color: var(--gris);
+      font-style: italic
+    }
+
+    .pasos {
+      counter-reset: p;
+      list-style: none;
+      padding: 0
+    }
+
+    .pasos li {
+      counter-increment: p;
+      padding: 8px 0 8px 44px;
+      position: relative;
+      border-bottom: 1px solid var(--linea)
+    }
+
+    .pasos li::before {
+      content: counter(p);
+      position: absolute;
+      left: 0;
+      top: 7px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--morado);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px
+    }
+
+    .resaltado {
+      background: #fff8f5;
+      border-left: 5px solid var(--naranja);
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-top: 14px;
+      font-size: 15px
+    }
+
+    #nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 24px;
+      background: #fff;
+      border-top: 1px solid var(--linea);
+      z-index: 10
+    }
+
+    #nav button {
+      font: inherit;
+      font-weight: 700;
+      font-size: 14px;
+      border: none;
+      background: var(--azul);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer
+    }
+
+    #nav button:disabled {
+      background: #c9c6da;
+      cursor: default
+    }
+
+    #contador {
+      font-size: 14px;
+      color: var(--gris);
+      font-weight: 600
+    }
+
+    #ayuda {
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--gris)
+    }
+
+    .pie {
+      position: absolute;
+      bottom: 14px;
+      left: 72px;
+      font-size: 12px;
+      color: var(--gris)
+    }
+  </style>
+</head>
+
+<body>
+  <div id="barra">
+    <div id="progreso"></div>
+  </div>
+
+  <main id="mazo">
+
+    <!-- 1. PORTADA -->
+    <section class="slide activa" id="s1" style="justify-content:center">
+      <h1>Censura en redes sociales chinas</h1>
+      <p class="sub">Comparación de algoritmos para clasificar publicaciones censuradas y no censuradas</p>
+      <ul style="list-style:none;padding:0;margin:0 0 6px;font-size:16px">
+        <li><strong>Carlos Fabián Esteva Gallegos</strong></li>
+        <li><strong>Ibrahim Munive Ramírez</strong></li>
+      </ul>
+      <p style="font-size:14px;color:var(--gris)">Procesamiento de Lenguaje Natural<br>Licenciatura en Ciencia de Datos
+      </p>
+      <div
+        style="margin-top:34px;height:8px;width:260px;background:linear-gradient(90deg,var(--azul),var(--morado),var(--naranja));border-radius:4px">
+      </div>
+    </section>
+
+    <!-- 3. INTRODUCCIÓN -->
+    <section class="slide" id="s3">
+      <p class="kicker">Introducción</p>
+      <h2>Problema y objetivo</h2>
+      <div class="cols">
+        <div>
+          <p>China tiene el sistema de censura de redes sociales más grande del mundo. Las publicaciones se eliminan
+            después de ser escritas, y los motivos no siempre son evidentes.</p>
+          <p>King, Pan y Roberts (2013) sostienen que la censura se dirige sobre todo a textos con <strong>potencial de
+              acción colectiva</strong>, más que a la crítica al Estado en sí.</p>
+          <p>Nuestro problema: a partir del texto de una publicación, ¿es posible predecir si fue censurada?</p>
+          <div class="resaltado"><strong>Tarea:</strong> clasificación binaria. Clase 1 = censurado, clase 0 = no
+            censurado.</div>
+        </div>
+        <div>
+          <h3>Objetivo general</h3>
+          <p>Evaluar qué tan bien distinguen los algoritmos vistos en el curso las publicaciones censuradas de las no
+            censuradas, y qué rasgos lingüísticos se asocian a la censura.</p>
+          <h3>Preguntas de investigación</h3>
+          <ul>
+            <li><strong>PI1.</strong> ¿Qué desempeño logran los modelos clásicos (conteos, TF-IDF, n-gramas, Naive
+              Bayes, regresión logística)?</li>
+            <li><strong>PI2.</strong> ¿Mejoran los vectores de palabras frente a las representaciones dispersas?</li>
+            <li><strong>PI3.</strong> ¿Qué rasgos distinguen a cada clase?</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. FLUJO INTERACTIVO -->
+    <section class="slide" id="s4">
+      <p class="kicker">Estrategia</p>
+      <h2>Diagrama de flujo del proyecto</h2>
+      <div class="flujo" id="flujo">
+        <button class="nodo pre" data-n="0"><span class="num">ETAPA 1</span><strong>Recolección</strong><span
+            class="etq hecho">Hecho</span></button>
+        <span class="flecha">→</span>
+        <button class="nodo pre" data-n="1"><span class="num">ETAPA 2</span><strong>Consolidación</strong><span
+            class="etq hecho">Hecho</span></button>
+        <span class="flecha">→</span>
+        <button class="nodo pre" data-n="2"><span class="num">ETAPA 3</span><strong>Limpieza</strong><span
+            class="etq hecho">Hecho</span></button>
+        <span class="flecha">→</span>
+        <button class="nodo" data-n="3"><span class="num">ETAPA 4</span><strong>EDA inicial</strong><span
+            class="etq hecho">Hecho</span></button>
+        <span class="flecha">→</span>
+        <button class="nodo" data-n="4"><span class="num">ETAPA 5</span><strong>Traducción como control</strong><span
+            class="etq hecho">Hecho</span></button>
+        <span class="flecha">→</span>
+        <button class="nodo" data-n="5"><span class="num">ETAPA 6</span><strong>Representaciones</strong><span
+            class="etq pend">En curso</span></button>
+        <span class="flecha">→</span>
+        <button class="nodo" data-n="6"><span class="num">ETAPA 7</span><strong>Modelos</strong><span
+            class="etq pend">Pendiente</span></button>
+        <span class="flecha">→</span>
+        <button class="nodo" data-n="7"><span class="num">ETAPA 8</span><strong>Evaluación</strong><span
+            class="etq pend">Pendiente</span></button>
+      </div>
+      <div class="detalle" id="detalleFlujo"></div>
+    </section>
+
+    <!-- 13. WEIBOSCOPE -->
+    <section class="slide" id="s13">
+      <p class="kicker">Intento fallido</p>
+      <h2>Weiboscope 2012: por qué lo descartamos</h2>
+      <div class="grid">
+        <div class="tarjeta n">
+          <h3>Escala</h3>
+          <p>52 semanas, unas 227 M de publicaciones. Solo se probó la semana 40.</p>
+        </div>
+        <div class="tarjeta n">
+          <h3>Clase muy rara</h3>
+          <p>Cerca de 0.03 % de las publicaciones está censurada. Con negativos al azar, el modelo habría aprendido tema
+            y fecha, no censura.</p>
+        </div>
+        <div class="tarjeta n">
+          <h3>Sesgos de captura</h3>
+          <p>Semana 40: 67 % de los censurados son retuits frente a 41 % de los no censurados. Imagen: 23 % frente a 42
+            %.</p>
+        </div>
+        <div class="tarjeta n">
+          <h3>Léxicos imprecisos</h3>
+          <p>Los léxicos semilla dejaban pasar publicaciones de tráfico (公安) y poemas (自由).</p>
+        </div>
+        <div class="tarjeta n">
+          <h3>Traducción sin ejecutar</h3>
+          <p>El módulo de traducción quedó escrito, pero no se corrió por falta de dependencias.</p>
+        </div>
+      </div>
+      <div class="resaltado"><strong>Decisión:</strong> usar el corpus de Ng et al. (2018), ya etiquetado, con 2,131
+        publicaciones consolidadas. Weiboscope queda como referencia de la fuente original.</div>
+    </section>
+
+    <!-- 5. CORPUS -->
+    <section class="slide" id="s5">
+      <p class="kicker">Descripción del corpus</p>
+      <h2>2,131 publicaciones de Sina Weibo</h2>
+      <p>Corpus de Ng et al. (2018): 16 archivos CSV, 8 temas, cada uno en versión censurada y no censurada. Filtra por
+        categoría:</p>
+      <div class="chips" id="chipsCat"></div>
+      <div class="caja" style="height:330px"><canvas id="cTemas"></canvas></div>
+      <p class="nota">Conteos después de la consolidación. Cada tema aparece en el nombre del archivo, p. ej.
+        <em>smog-censored.csv</em>.</p>
+    </section>
+
+    <!-- 6. BALANCE Y LÍNEA BASE -->
+    <section class="slide" id="s6">
+      <p class="kicker">Balance de clases</p>
+      <h2>Línea base: predecir siempre la clase mayoritaria</h2>
+      <div class="cols">
+        <div class="caja" style="height:320px"><canvas id="cBalance"></canvas></div>
+        <div>
+          <div class="grid" style="grid-template-columns:1fr 1fr">
+            <div class="tarjeta n">
+              <h3>Censurado</h3>
+              <div class="cifra n">999</div>
+              <p>46.9 %</p>
+            </div>
+            <div class="tarjeta">
+              <h3>No censurado</h3>
+              <div class="cifra">1,132</div>
+              <p>53.1 %</p>
+            </div>
+          </div>
+          <h3>Referencia que todo modelo debe superar</h3>
+          <div id="baseline"></div>
+          <p class="nota">Calculado a partir de los conteos reales. Un modelo que solo predice la clase mayoritaria
+            obtiene 0.347 de F1 macro: ese es el piso.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. HALLAZGO: LONGITUD -->
+    <section class="slide" id="s7">
+      <p class="kicker">Hallazgos del EDA</p>
+      <h2>La longitud no separa limpiamente las clases</h2>
+      <div class="chips" id="chipsLong">
+        <button class="chip on" data-v="both">Ambas clases</button>
+        <button class="chip n on" data-v="0">Censurado</button>
+        <button class="chip m on" data-v="1">No censurado</button>
+      </div>
+      <div class="caja" style="height:330px"><canvas id="cLong"></canvas></div>
+      <div class="cols" style="margin-top:12px">
+        <div class="tarjeta n">
+          <h3>Mediana censurado</h3>
+          <div class="cifra n">100</div>
+          <p>caracteres</p>
+        </div>
+        <div class="tarjeta m">
+          <h3>Mediana no censurado</h3>
+          <div class="cifra">71</div>
+          <p>caracteres, con cola larga (máximo 637)</p>
+        </div>
+      </div>
+      <p class="nota">Se usa la longitud en caracteres chinos de <em>texto_zh</em>, después de la limpieza.</p>
+    </section>
+
+    <!-- 8. HALLAZGO: ARTEFACTO -->
+    <section class="slide" id="s8">
+      <p class="kicker">Hallazgos del EDA</p>
+      <h2>Un carácter invisible separa las clases</h2>
+      <p>El carácter <strong>U+200B</strong> (espacio de ancho cero) aparece en el texto crudo de <strong>60.4
+          %</strong> de las no censuradas y en <strong>2.2 %</strong> de las censuradas.</p>
+      <div class="caja" style="height:300px"><canvas id="cZW"></canvas></div>
+      <div class="resaltado"><strong>Implicación:</strong> un clasificador podría aprender este carácter en lugar de la
+        censura. Por eso la limpieza lo quita de <em>texto_zh</em>, se conserva solo como bandera <em>tiene_zw</em> para
+        controles y <strong>no entra como rasgo</strong> de los modelos. Esto es una hipótesis sobre el origen del
+        sesgo, no una conclusión.</div>
+    </section>
+
+    <!-- 9. PREPROCESAMIENTO -->
+    <section class="slide" id="s9">
+      <p class="kicker">Preprocesamiento</p>
+      <h2>Del CSV crudo al corpus listo para modelar</h2>
+      <ol class="pasos">
+        <li><strong>Consolidación</strong> (consolidacion.py). Une los 16 CSV. La etiqueta y el tema salen del nombre
+          del archivo (<em>tema-etiqueta.csv</em>). Solo <em>fifty-cent-uncensored.csv</em> trae encabezado, y se omite.
+        </li>
+        <li><strong>Limpieza.</strong> Quita el U+200B y los espacios de los extremos; elimina textos vacíos; elimina 4
+          filas con etiquetas contradictorias; conserva una copia de cada texto duplicado (27 eliminados).</li>
+        <li><strong>Traducción como control.</strong> Se tradujo <em>texto_zh</em> con opus-mt-zh-en para obtener
+          <em>corpus_en.csv</em>. Una revisión de 30 filas mostró errores en términos de censura y nombres propios (五毛, 薄熙来, 新浪, 地沟油), así que el análisis principal se hace sobre el chino y la traducción sirve como comparación.</li>
+      </ol>
+      <div class="resaltado"><strong>Estado actual:</strong> <em>corpus_zh.csv</em> contiene 2,131 publicaciones en
+        chino con sus columnas de etiqueta, tema, categoría y longitud. Las representaciones y los modelos usan <em>texto_zh</em>; <em>corpus_en.csv</em> es el control.</div>
+    </section>
+
+    <!-- 10. METODOLOGÍA -->
+    <section class="slide" id="s10">
+      <p class="kicker">Metodología</p>
+      <h2>Modelos a comparar</h2>
+      <p class="leyenda">Haz clic en cada celda para ver qué combinación se evalúa.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Algoritmo</th>
+            <th>Conteos (BoW)</th>
+            <th>TF-IDF</th>
+            <th>N-gramas</th>
+            <th>Vectores de palabras</th>
+          </tr>
+        </thead>
+        <tbody id="matriz"></tbody>
+      </table>
+      <div class="detalle" id="detalleMatriz"></div>
+    </section>
+
+    <!-- 11. EVALUACIÓN Y RESULTADOS -->
+    <section class="slide" id="s11">
+      <p class="kicker">Evaluación y resultados</p>
+      <h2>Evaluación y resultados</h2>
+      <div class="cols">
+        <div>
+          <h3>Métricas</h3>
+          <ul>
+            <li>Precisión, recall y F1 por clase.</li>
+            <li><strong>F1 macro</strong> como métrica principal.</li>
+            <li>Matriz de confusión y análisis de errores con ejemplos.</li>
+          </ul>
+          <h3>Validación</h3>
+          <ul>
+            <li>Validación cruzada K-fold estratificada.</li>
+            <li>Partición cronológica no es posible: los CSV de Ng et al. no traen fecha. Es una limitación que
+              reportaremos.</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Modelos</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Modelo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Clase mayoritaria</td>
+              </tr>
+              <tr>
+                <td>Naive Bayes / TF-IDF</td>
+              </tr>
+              <tr>
+                <td>Regresión logística / TF-IDF</td>
+              </tr>
+              <tr>
+                <td>Vectores de palabras + RL</td>
+              </tr>
+              <tr>
+                <td>Modelo de lenguaje por clase</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12. PRÓXIMOS PASOS -->
+    <section class="slide" id="s12">
+      <p class="kicker">Conclusiones</p>
+      <h2>Próximos pasos</h2>
+      <ol class="pasos">
+        <li>Comparar los modelos sobre el chino con los modelos sobre la traducción al inglés (control).</li>
+        <li>Ejecutar los modelos con validación K-fold.</li>
+        <li>Comparar con y sin el artefacto del carácter invisible.</li>
+        <li>Analizar errores y rasgos asociados a cada clase.</li>
+      </ol>
+    </section>
+
+    <!-- 14. REFERENCIAS -->
+    <section class="slide" id="s14">
+      <p class="kicker">Referencias</p>
+      <h2>Fuentes</h2>
+      <ul style="font-size:15px;line-height:1.7">
+        <li>King, G., Pan, J., & Roberts, M. E. (2013). How censorship in China allows government criticism but silences
+          collective expression. <em>American Political Science Review</em>, 107(2), 326–343.</li>
+        <li>Ng, K. Y., Feldman, A., Peng, J., & Leberknight, C. (2018). Linguistic characteristics of censorable
+          language on SinaWeibo. <em>Proceedings of the First Workshop on NLP for Internet Freedom</em>.</li>
+        <li>Fu, K., Chan, C. H., & Chau, M. (2013). Assessing censorship on microblogs in China. <em>IEEE Internet
+            Computing</em>, 17(3), 42–50.</li>
+        <li>Arefi, M. N., et al. (2019). Assessing post deletion in Sina Weibo. <em>Proceedings of the Workshop on NLP
+            for Internet Freedom</em>.</li>
+        <li>Open Weiboscope Data. Universidad de Hong Kong (HKU). <em>DataHub HKU</em>.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <nav id="nav">
+    <button id="ant">← Anterior</button>
+    <button id="sig">Siguiente →</button>
+    <span id="contador"></span>
+    <span id="ayuda">Teclas ← → para navegar</span>
+  </nav>
+
+  <script>
+    /* ---------- Datos del corpus consolidado (consolidacion.py, 2,131 publicaciones) ---------- */
+    const TEMAS = ['boxilai', 'censored', 'ditch-oil', 'fifty-cent', 'kindergarten', 'melamine', 'poisonous-milk-powder', 'smog'];
+    const CENS = [125, 193, 119, 253, 53, 17, 21, 218];
+    const UNC = [75, 215, 136, 290, 93, 37, 47, 239];
+    const CAT = {
+      'boxilai': 'Bo Xilai',
+      'censored': 'Censura y propaganda en internet',
+      'fifty-cent': 'Censura y propaganda en internet',
+      'ditch-oil': 'Contaminación e inocuidad alimentaria',
+      'melamine': 'Contaminación e inocuidad alimentaria',
+      'poisonous-milk-powder': 'Contaminación e inocuidad alimentaria',
+      'smog': 'Contaminación e inocuidad alimentaria',
+      'kindergarten': 'Abuso en guarderías'
+    };
+    const CATS = ['Todas', 'Bo Xilai', 'Censura y propaganda en internet', 'Contaminación e inocuidad alimentaria', 'Abuso en guarderías'];
+    const N_CENS = 999, N_UNC = 1132, N = N_CENS + N_UNC;
+
+    /* Histograma de longitud (ancho de bin 20 caracteres, último bin = 400+) */
+    const HIST_CENS = [49, 121, 122, 88, 119, 145, 212, 142, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const HIST_UNC = [112, 238, 154, 111, 102, 98, 147, 72, 23, 20, 7, 12, 13, 7, 2, 2, 2, 1, 0, 1, 8];
+    const HIST_LAB = Array.from({ length: 20 }, (_, i) => `${i * 20}-${i * 20 + 19}`).concat(['400+']);
+
+    /* Porcentaje de publicaciones con U+200B por tema */
+    const ZW_CENS = [0, 1.0, 0.8, 0.4, 20.8, 0, 0, 3.2];
+    const ZW_UNC = [2.7, 66.0, 75.0, 73.8, 18.3, 73.0, 57.4, 64.0];
+
+    const COL = { azul: '#312783', naranja: '#E94E1B', morado: '#5A2673', gris: '#6b6880' };
+    Chart.defaults.font.family = "'Montserrat', sans-serif";
+    Chart.defaults.color = '#1d1a33';
+
+    /* ---------- Navegación ---------- */
+    const slides = [...document.querySelectorAll('.slide')];
+    let actual = 0;
+    const inicializado = {};
+
+    const inits = {
+      s4: null,
+      s5: initTemas,
+      s6: initBalance,
+      s7: initLongitud,
+      s8: initZW,
+      s10: initMatriz
+    };
+
+    function ir(i) {
+      actual = Math.max(0, Math.min(slides.length - 1, i));
+      slides.forEach((s, k) => s.classList.toggle('activa', k === actual));
+      document.getElementById('progreso').style.width = (actual / (slides.length - 1) * 100) + '%';
+      document.getElementById('contador').textContent = (actual + 1) + ' / ' + slides.length;
+      document.getElementById('ant').disabled = actual === 0;
+      document.getElementById('sig').disabled = actual === slides.length - 1;
+      const id = slides[actual].id;
+      if (inits[id] && !inicializado[id]) { inicializado[id] = true; inits[id](); }
+    }
+
+    document.getElementById('ant').onclick = () => ir(actual - 1);
+    document.getElementById('sig').onclick = () => ir(actual + 1);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown') ir(actual + 1);
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') ir(actual - 1);
+    });
+    document.querySelectorAll('[data-ir]').forEach(b => b.onclick = () => ir(+b.dataset.ir - 1));
+
+    /* ---------- Diagrama de flujo ---------- */
+    const etapas = [
+      ['Recolección', 'Hecho', 'Se usaron los 16 CSV de Ng et al. (2018): 8 temas, cada uno censurado y no censurado. El corpus no trae fecha ni URL, solo el texto de cada publicación.'],
+      ['Consolidación', 'Hecho', 'consolidacion.py une los 16 archivos. La etiqueta y el tema se leen del nombre del archivo; se agrega la categoría de Ng et al. El resultado es un único CSV de 2,131 filas.'],
+      ['Limpieza', 'Hecho', 'Se quita el U+200B y los espacios de los extremos, se eliminan textos vacíos, 4 filas con etiquetas contradictorias y 27 duplicados. La bandera tiene_zw se conserva solo como control.'],
+      ['EDA inicial', 'Hecho', 'Análisis exploratorio sobre los datos originales, antes de traducir: balance de clases y frecuencia del carácter U+200B en el texto crudo. Estos resultados orientan la limpieza.'],
+      ['Traducción como control', 'Hecho', 'opus-mt-zh-en sobre texto_zh produce corpus_en.csv. La revisión de 30 filas muestra errores en términos de censura y nombres propios, por eso el análisis principal usa el chino.'],
+      ['Representaciones', 'En curso', 'Sobre texto_zh con jieba: bolsa de palabras, TF-IDF de palabras y bigramas, n-gramas de caracteres; vectores Word2Vec entrenados con el corpus y FastText preentrenado, promediados por documento.'],
+      ['Modelos', 'Pendiente', 'Clase mayoritaria como referencia; Naive Bayes multinomial; regresión logística; modelos de lenguaje de n-gramas por clase.'],
+      ['Evaluación', 'Pendiente', 'F1 macro como métrica principal, precisión y recall por clase, matriz de confusión y validación cruzada K-fold estratificada.']
+    ];
+    const nodos = document.querySelectorAll('.nodo');
+    function selEtapa(n) {
+      nodos.forEach(b => b.classList.toggle('sel', +b.dataset.n === n));
+      const [t, e, d] = etapas[n];
+      document.getElementById('detalleFlujo').innerHTML = `<strong>${n + 1}. ${t}</strong> &nbsp;<span class="etq ${e === 'Hecho' ? 'hecho' : 'pend'}">${e}</span><br><br>${d}`;
+    }
+    nodos.forEach(b => b.onclick = () => selEtapa(+b.dataset.n));
+    selEtapa(0);
+
+    /* ---------- Corpus: barras por tema con filtro de categoría ---------- */
+    let chartTemas;
+    function initTemas() {
+      const cont = document.getElementById('chipsCat');
+      CATS.forEach((c, i) => {
+        const b = document.createElement('button');
+        b.className = 'chip' + (i === 0 ? ' on' : '');
+        b.textContent = c;
+        b.onclick = () => {
+          cont.querySelectorAll('.chip').forEach(x => x.classList.remove('on'));
+          b.classList.add('on');
+          filtrarCat(c);
+        };
+        cont.appendChild(b);
+      });
+      chartTemas = new Chart(document.getElementById('cTemas'), {
+        type: 'bar',
+        data: {
+          labels: [], datasets: [
+            { label: 'Censurado', data: [], backgroundColor: COL.naranja },
+            { label: 'No censurado', data: [], backgroundColor: COL.azul }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } },
+          scales: { y: { beginAtZero: true, title: { display: true, text: 'Publicaciones' } } }
+        }
+      });
+      filtrarCat('Todas');
+    }
+    function filtrarCat(c) {
+      const idx = TEMAS.map((t, i) => i).filter(i => c === 'Todas' || CAT[TEMAS[i]] === c);
+      chartTemas.data.labels = idx.map(i => TEMAS[i]);
+      chartTemas.data.datasets[0].data = idx.map(i => CENS[i]);
+      chartTemas.data.datasets[1].data = idx.map(i => UNC[i]);
+      chartTemas.update();
+    }
+
+    /* ---------- Balance y línea base ---------- */
+    function initBalance() {
+      new Chart(document.getElementById('cBalance'), {
+        type: 'doughnut',
+        data: { labels: ['Censurado', 'No censurado'], datasets: [{ data: [N_CENS, N_UNC], backgroundColor: [COL.naranja, COL.azul], borderWidth: 0 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+      });
+      document.getElementById('baseline').innerHTML = baselineHTML();
+    }
+    function baselineMetricas() {
+      const acc = N_UNC / N;                 // predice siempre "no censurado"
+      const pU = acc, rU = 1;
+      const f1U = 2 * pU * rU / (pU + rU);
+      const f1C = 0;                       // sin predicciones positivas
+      return { acc, f1U, f1C, macro: (f1U + f1C) / 2 };
+    }
+    function baselineHTML() {
+      const m = baselineMetricas();
+      return `<table>
+    <tr><th>Métrica</th><th>Valor</th></tr>
+    <tr><td>Exactitud (accuracy)</td><td>${(m.acc * 100).toFixed(1)} %</td></tr>
+    <tr><td>F1 de la clase "no censurado"</td><td>${m.f1U.toFixed(3)}</td></tr>
+    <tr><td>F1 de la clase "censurado"</td><td>${m.f1C.toFixed(3)}</td></tr>
+    <tr><td><strong>F1 macro</strong></td><td><strong>${m.macro.toFixed(3)}</strong></td></tr>
+  </table>`;
+    }
+
+    /* ---------- Longitud ---------- */
+    let chartLong;
+    function initLongitud() {
+      chartLong = new Chart(document.getElementById('cLong'), {
+        type: 'bar',
+        data: {
+          labels: HIST_LAB, datasets: [
+            { label: 'Censurado', data: HIST_CENS, backgroundColor: 'rgba(233,78,27,.85)' },
+            { label: 'No censurado', data: HIST_UNC, backgroundColor: 'rgba(49,39,131,.7)' }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+          scales: { x: { title: { display: true, text: 'Longitud en caracteres' } }, y: { title: { display: true, text: 'Publicaciones' } } }
+        }
+      });
+      document.querySelectorAll('#chipsLong .chip').forEach(b => {
+        b.onclick = () => {
+          const v = b.dataset.v;
+          const chips = [...document.querySelectorAll('#chipsLong .chip')];
+          if (v === 'both') {
+            chips.forEach(x => x.classList.add('on'));
+            chartLong.setDatasetVisibility(0, true); chartLong.setDatasetVisibility(1, true);
+          } else {
+            const k = +v;
+            b.classList.toggle('on');
+            const visible = chips.filter(x => x.dataset.v !== 'both' && x.classList.contains('on')).map(x => +x.dataset.v);
+            chips[0].classList.toggle('on', visible.length === 2);
+            chartLong.setDatasetVisibility(0, visible.includes(0));
+            chartLong.setDatasetVisibility(1, visible.includes(1));
+          }
+          chartLong.update();
+        };
+      });
+    }
+
+    /* ---------- Artefacto U+200B ---------- */
+    function initZW() {
+      new Chart(document.getElementById('cZW'), {
+        type: 'bar',
+        data: {
+          labels: TEMAS, datasets: [
+            { label: 'Censurado (% con U+200B)', data: ZW_CENS, backgroundColor: COL.naranja },
+            { label: 'No censurado (% con U+200B)', data: ZW_UNC, backgroundColor: COL.azul }
+          ]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, plugins: {
+            legend: { position: 'bottom' },
+            tooltip: { callbacks: { label: c => `${c.dataset.label}: ${c.parsed.y.toFixed(1)} %` } }
+          },
+          scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: '% de publicaciones' } } }
+        }
+      });
+    }
+
+    /* ---------- Matriz de modelos ---------- */
+    const FILAS = ['Naive Bayes multinomial', 'Regresión logística', 'Modelo de lenguaje por clase'];
+    const COLS = ['Conteos (BoW)', 'TF-IDF', 'N-gramas', 'Vectores de palabras'];
+    const DESC = {
+      'Naive Bayes multinomial|Conteos (BoW)': '<strong>NB con conteos.</strong> Log P(c) + Σ log P(w|c) con suavizado de Laplace. Línea base lexical.',
+      'Naive Bayes multinomial|TF-IDF': '<strong>NB con TF-IDF.</strong> Mismo modelo con las representaciones ponderadas por TF-IDF, para comparar con los conteos.',
+      'Naive Bayes multinomial|N-gramas': '<strong>NB con n-gramas</strong> de palabras y de caracteres. Los caracteres son un control frente a la segmentación del chino.',
+      'Regresión logística|TF-IDF': '<strong>Regresión logística sobre TF-IDF.</strong> Modelo discriminativo sobre la misma representación.',
+      'Regresión logística|Vectores de palabras': '<strong>Regresión logística sobre vectores promedio.</strong> Word2Vec entrenado sobre el corpus de entrenamiento y promediado por documento. Responde PI2.',
+      'Modelo de lenguaje por clase|N-gramas': '<strong>Modelo de lenguaje de n-gramas por clase.</strong> Se entrena uno por clase y se clasifica por menor perplejidad.'
+    };
+    function initMatriz() {
+      const tb = document.getElementById('matriz');
+      tb.innerHTML = '';
+      FILAS.forEach(f => {
+        const tr = document.createElement('tr');
+        const td0 = document.createElement('td'); td0.innerHTML = `<strong>${f}</strong>`; tr.appendChild(td0);
+        COLS.forEach(c => {
+          const td = document.createElement('td');
+          const key = f + '|' + c;
+          if (DESC[key]) {
+            const b = document.createElement('button');
+            b.textContent = 'Evaluar';
+            b.onclick = () => {
+              tb.querySelectorAll('button').forEach(x => x.classList.remove('on'));
+              b.classList.add('on');
+              document.getElementById('detalleMatriz').innerHTML = DESC[key];
+            };
+            td.appendChild(b);
+          } else {
+            const b = document.createElement('button'); b.className = 'na'; b.textContent = '—'; b.disabled = true; td.appendChild(b);
+          }
+          tr.appendChild(td);
+        });
+        tb.appendChild(tr);
+      });
+      document.getElementById('detalleMatriz').innerHTML = 'Selecciona una celda para ver qué combinación se evalúa. Todas las combinaciones usan la misma partición y la misma métrica (F1 macro).';
+    }
+
+    ir(0);
+  </script>
+</body>
+
+</html>
