@@ -9,7 +9,7 @@ Autor(es):
 
 Detección y análisis lingüístico de publicaciones censuradas en redes sociales chinas (Sina Weibo). Se trata de un problema de clasificación binaria (censurado / no censurado) acompañado de un análisis de los rasgos léxicos y gramaticales más discriminativos.
 
-El corpus está en inglés. Las publicaciones o comentarios originales en chino se traducen automáticamente al inglés tentativamente con el modelo `Helsinki-NLP/opus-mt-zh-en`, disponible en Hugging Face bajo licencia CC-BY-4.0.
+El corpus está en chino y el análisis principal se hace sobre el texto chino. Como comparación de control, las publicaciones se traducen automáticamente al inglés con el modelo `Helsinki-NLP/opus-mt-zh-en`, disponible en Hugging Face bajo licencia CC-BY-4.0. La traducción no se usa para el análisis léxico porque pierde términos de censura y nombres propios.
 
 ## Objetivos
 
@@ -35,11 +35,11 @@ representaciones léxicas dispersas, sobre todo ante eufemismos y homófonos?
 
 **Etiqueta de censura.** La etiqueta proviene de la plataforma (por ejemplo, "permission denied" en WeiboScope), no de anotación propia. Es un indicador indirecto y no una confirmación oficial de censura.
 
-**Muestra.** Se traduce una muestra de publicaciones censuradas y una muestra aleatoria de no censuradas del mismo periodo. Las publicaciones borradas por causas no identificadas se excluyen.
+**Muestra.** Se usa el corpus completo consolidado de 2,131 publicaciones.
 
-**Traducción.** Se revisará a mano una muestra de traducciones, incluidas publicaciones con homófonos y con chino tradicional, para decidir si el modelo es adecuado.
+**Traducción.** Se revisó a mano una muestra aleatoria de 30 traducciones. Mostró errores en términos de censura (五毛 se traduce como "gulls" o "five-moys"), nombres propios (薄熙来 como "Bo Xi") y eufemismos (地沟油 como "gutter oil" o "gullible oils"). Por eso el análisis principal se hace sobre el chino. Pendiente revisar homófonos y chino tradicional.
 
-**Dominio.** Las fuentes no traen etiqueta temática. El filtro de dominio político, económico y comercial se aplica con listas de términos en inglés y se valida con una muestra anotada por los dos integrantes (kappa de Cohen).
+**Dominio.** Las fuentes no traen etiqueta temática. El filtro de dominio político, económico y comercial se aplica con listas de términos en chino y se valida con una muestra anotada por los dos integrantes (kappa de Cohen).
 
 **Partición.** Cronológica, no aleatoria, para evitar fuga temporal.
 
@@ -49,7 +49,7 @@ representaciones léxicas dispersas, sobre todo ante eufemismos y homófonos?
 
 - Los datos de 2012 podrían no reflejar los criterios de censura actuales.
 
-- La traducción automática puede borrar o alterar eufemismos y homófonos, y sus errores se propagan a los modelos. El modelo no fue entrenado con texto de redes sociales, por lo que su calidad en este dominio debe verificarse.
+- La traducción automática puede borrar o alterar eufemismos y homófonos. En la revisión de muestra, los términos de censura y los nombres propios salieron mal traducidos, así que la traducción no es base del análisis. El modelo no fue entrenado con texto de redes sociales, por lo que su calidad en este dominio debe verificarse.
 
 - Los resultados no se extienden a otros temas ni a otras plataformas.
 
